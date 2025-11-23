@@ -6,7 +6,8 @@ const fs = require("fs");
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, "..", "uploads");
+// Use /tmp for Render (safe writable directory)
+const uploadDir = "/tmp";
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 const storage = multer.diskStorage({
@@ -19,36 +20,60 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// IMPORTANT: Python3 on Render
+const PYTHON_CMD = "python3";
+
 router.post("/file", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No image uploaded" });
 
   const imgPath = req.file.path;
 
-  const python = spawn("python", [
-    path.join(__dirname, "..", "inference", "inference.py"),
+  const modelPath = path.join(__dirname, "..", "model", "model.tflite");
+  const inferenceScript = path.join(__dirname, "..", "inference", "inference.py");
+
+  if (!fs.existsSync(modelPath)) {
+    return res.status(500).json({
+      error: "Model file not found",
+      modelPath: modelPath,
+    });
+  }
+
+  const python = spawn(PYTHON_CMD, [
+    inferenceScript,
     "--model",
-    path.join(__dirname, "..", "model", "model.tflite"),
+    modelPath,
     "--image",
     imgPath,
   ]);
 
+  // IMPORTANT: log spawn errors so we can see why Python didn't start on Render
+  python.on("error", (err) => {
+    console.error("PYTHON SPAWN ERROR:", err);
+  });
+
   let output = "";
-  let error = "";
+  let errorOutput = "";
 
   python.stdout.on("data", (data) => (output += data.toString()));
-  python.stderr.on("data", (data) => (error += data.toString()));
+  python.stderr.on("data", (data) => (errorOutput += data.toString()));
 
   python.on("close", (code) => {
-    fs.unlinkSync(imgPath);
+    try { fs.unlinkSync(imgPath); } catch {}
 
     if (code !== 0) {
-      return res.status(500).json({ error: "Python error", details: error });
+      return res.status(500).json({
+        error: "Python error",
+        details: errorOutput,
+      });
     }
 
     try {
       return res.json(JSON.parse(output));
     } catch (e) {
-      return res.status(500).json({ error: "Invalid JSON", raw: output });
+      return res.status(500).json({
+        error: "Invalid JSON output",
+        raw: output,
+      });
     }
   });
 });
