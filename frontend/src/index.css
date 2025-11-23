@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Georgia", serif;
+  background: white;
+}
+
+.header {
+  background: #6a00ff;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.app-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.preview-image {
+  width: 350px;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.result-box {
+  background: #f7f7f7;
+  padding: 20px;
+  width: 350px;
+  margin: 20px auto;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 20px;
+  line-height: 1.6;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.button-row {
+  margin-top: 20px;
+}
+
+.btn {
+  border: none;
+  padding: 14px 25px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+.btn.purple {
+  background: #7d00ff;
+  color: white;
+}
+
+.btn.green {
+  background: #009b1a;
+  color: white;
+}
