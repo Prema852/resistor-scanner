@@ -14,5 +14,9 @@ app.get("/", (req, res) => {
   res.send("Resistor Scanner Backend Running");
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log("Backend listening on 5000"));
+// IMPORTANT: USE RENDER PORT
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+});
