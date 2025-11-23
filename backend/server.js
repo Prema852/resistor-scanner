@@ -4,7 +4,13 @@ const path = require("path");
 
 const app = express();
 
-app.use(cors());
+// FIX: Explicit CORS configuration for Vercel frontend
+app.use(cors({
+  origin: "*",  
+  methods: ["GET", "POST"],  
+  allowedHeaders: ["Content-Type"],
+}));
+
 app.use(express.json());
 
 // FIXED ROUTE LOADING
