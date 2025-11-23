@@ -30,9 +30,16 @@ function App() {
     formData.append("image", image);
 
     try {
-      const backendURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      // ✔ Correct backend URL with fallback
+     const backendURL = import.meta.env.VITE_BACKEND_URL;
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/scan/file`, formData, {
+      if (!backendURL) {
+        console.error("❌ VITE_BACKEND_URL is missing!");
+        alert("Backend URL not configured");
+        return;
+      }
+
+      const res = await axios.post(`${backendURL}/api/scan/file`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -49,12 +56,10 @@ function App() {
 
       <div className="content">
         
-        {/* Image Preview */}
         {preview && (
           <img src={preview} alt="preview" className="preview-image" />
         )}
 
-        {/* Result */}
         {result && (
           <div className="result-box">
             <p><strong>Bands:</strong> {result.band1_color} {result.band2_color} {result.multiplier_color} {result.tolerance_color}</p>
@@ -63,7 +68,6 @@ function App() {
           </div>
         )}
 
-        {/* Hidden file input */}
         <input
           type="file"
           accept="image/*"
@@ -72,7 +76,6 @@ function App() {
           style={{ display: "none" }}
         />
 
-        {/* Buttons */}
         <div className="button-row">
           <button className="btn purple" onClick={openFilePicker}>
             Select or Capture Image
