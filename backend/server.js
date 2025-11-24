@@ -5,16 +5,21 @@ const path = require("path");
 const app = express();
 const cors = require("cors");
 
-app.use(cors()); // allow all origins while testing
+// Enable CORS
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API routes
 app.use("/api/scan", scanRouter);
 
-// optional: serve uploads (for debugging) - comment out in production
+// Serve uploaded files for debugging (optional)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Backend listening on ${PORT}`);
+// IMPORTANT: Use PORT provided by Railway
+const PORT = process.env.PORT || 8080;
+
+// Start server
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend running on port ${PORT}`);
 });
