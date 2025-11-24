@@ -1,7 +1,7 @@
-flask
+Flask
 numpy
-Pillow
 opencv-python-headless
-tensorflow-lite==2.12.0
-tensorflow-lite-support==0.4.3
+Pillow
+protobuf==3.20.*
+tflite-runtime==2.12.0
 
