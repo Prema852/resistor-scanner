@@ -1,7 +1,8 @@
 Flask
-numpy
+numpy==1.26.4
 opencv-python-headless
 Pillow
 protobuf==3.20.*
-tflite-runtime==2.12.0
+tflite-runtime==2.11.0
+
 
