@@ -1,28 +1,20 @@
+// backend/server.js
 const express = require("express");
-const cors = require("cors");
+const scanRouter = require("./routes/scan");
 const path = require("path");
-
 const app = express();
+const cors = require("cors");
 
-// FIX: Explicit CORS configuration for Vercel frontend
-app.use(cors({
-  origin: "*",  
-  methods: ["GET", "POST"],  
-  allowedHeaders: ["Content-Type"],
-}));
-
+app.use(cors()); // allow all origins while testing
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// FIXED ROUTE LOADING
-app.use("/api/scan", require(path.join(__dirname, "routes", "scan")));
+app.use("/api/scan", scanRouter);
 
-app.get("/", (req, res) => {
-  res.send("Resistor Scanner Backend Running");
-});
+// optional: serve uploads (for debugging) - comment out in production
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// IMPORTANT: USE RENDER PORT
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`);
+  console.log(`Backend listening on ${PORT}`);
 });

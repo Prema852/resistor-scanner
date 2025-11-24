@@ -1,31 +1,83 @@
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+// frontend/src/components/CameraCapture.jsx
+import React, { useState } from "react";
+import axios from "axios";
 
+function CameraCapture({ onResult, onImagePreview }) {
+  const [processing, setProcessing] = useState(false);
 
-async function sendToBackend(file, previewUrl) {
-  setIsLoading(true);
-  setErrorMsg(null);
-  try {
-    const form = new FormData();
-    form.append("image", file);
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    `${window.location.protocol}//${window.location.hostname}:5000`;
 
-    const res = await axios.post(
-      `${BACKEND_URL}/api/scan/file`,
-      form,
-      {
+  const handleGallery = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const previewURL = URL.createObjectURL(file);
+    onImagePreview(previewURL); // show image BEFORE processing
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    setProcessing(true);
+
+    try {
+      const res = await axios.post(`${API_URL}/api/scan/file`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 30000,
-      }
-    );
-
-    if (res?.data) {
-      if (typeof onResult === "function") onResult(res.data, previewUrl);
-    } else {
-      setErrorMsg("Invalid response from server");
+      });
+      onResult(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Error processing image.");
     }
-  } catch (err) {
-    console.error(err);
-    setErrorMsg(err?.response?.data?.error || err.message || "Upload failed");
-  } finally {
-    setIsLoading(false);
-  }
+
+    setProcessing(false);
+  };
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      {/* ONLY GALLERY INPUT */}
+      <input
+        type="file"
+        id="galleryInput"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleGallery}
+      />
+
+      <label
+        htmlFor="galleryInput"
+        style={{
+          display: "block",
+          padding: "12px",
+          margin: "8px auto",
+          width: "70%",
+          background: "#3b82f6",
+          color: "white",
+          borderRadius: 8,
+          cursor: "pointer",
+          fontSize: 16,
+        }}
+      >
+        🖼️ Choose From Gallery
+      </label>
+
+      {processing && (
+        <div
+          style={{
+            marginTop: 12,
+            padding: 12,
+            background: "#18a058",
+            color: "white",
+            borderRadius: 8,
+          }}
+        >
+          Processing...
+        </div>
+      )}
+    </div>
+  );
 }
+
+export default CameraCapture;
