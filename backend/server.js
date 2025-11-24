@@ -13,6 +13,11 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/scan", scanRouter);
 
+// Root route (Fix for Railway 502 error)
+app.get("/", (req, res) => {
+  res.send("Resistor Scanner Backend is running 🚀");
+});
+
 // Static upload folder (optional for debugging)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
